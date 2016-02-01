@@ -7,7 +7,7 @@ var CallHandler = {
     return HandlerTool.buildNode('call', {
       func: node.expression,
       args: new UglifyJS.AST_Array({elements: node.args})
-    }, this.appTransformer);
+    });
   }
 };
 

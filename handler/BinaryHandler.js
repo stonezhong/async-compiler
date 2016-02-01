@@ -10,7 +10,7 @@ var BinaryHandler = {
       operator: operator,
       left: node.left,
       right: node.right
-    }, this.appTransformer);
+    });
   }
 };
 

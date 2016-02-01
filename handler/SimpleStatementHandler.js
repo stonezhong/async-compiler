@@ -6,8 +6,7 @@ var SimpleStatementHandler = {
     descend(node, this);
     return HandlerTool.buildNode(
       'simpleStatement',
-      {body: node.body},
-      this.appTransformer
+      {body: node.body}
     );
   }
 };

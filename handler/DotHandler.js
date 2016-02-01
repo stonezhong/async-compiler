@@ -10,8 +10,7 @@ var DotHandler = {
       {
         literal: new UglifyJS.AST_String({value: node.property}),
         refType: new UglifyJS.AST_String({value: 'literal'})
-      },
-      this.appTransformer
+      }
     );
 
     return HandlerTool.buildNode(
@@ -19,8 +18,7 @@ var DotHandler = {
       {
         owner: node.expression,
         field: fieldNode
-      },
-      this.appTransformer
+      }
     );
   }
 };

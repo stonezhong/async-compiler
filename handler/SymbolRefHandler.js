@@ -10,8 +10,7 @@ var SymbolRefHandler = {
       {
         name: new UglifyJS.AST_String({value: node.name}),
         refType: new UglifyJS.AST_String({value: variableType})
-      },
-      this.appTransformer
+      }
     );
   }
 };

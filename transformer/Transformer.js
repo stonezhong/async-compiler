@@ -61,6 +61,8 @@ class Transformer {
         transformer.fam.setArgumentVariable(varName);
       }
 
+      transformer.fam.setExternalVariable('undefined');
+
 
       // 预扫描阶段只是收集下列信息
       // 定义的局部变量

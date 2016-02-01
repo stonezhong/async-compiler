@@ -1,6 +1,6 @@
 var UglifyJS = require('uglify-js');
 
-function buildNode(type, options, transformer) {
+function buildNode(type, options) {
   var properties = [ ];
 
   properties.push(
@@ -22,8 +22,20 @@ function buildNode(type, options, transformer) {
   return new UglifyJS.AST_Object({properties: properties});
 }
 
+// build node for symbol 'undefined'
+function buildUndefinedSymReference() {
+  return buildNode(
+    'ref',
+    {
+      refType: new UglifyJS.AST_String({value: 'external'}),
+      name: new UglifyJS.AST_String({value: 'undefined'})
+    }
+  );
+}
+
 var HandlerTool = {
-  buildNode: buildNode
+  buildNode: buildNode,
+  buildUndefinedSymReference: buildUndefinedSymReference,
 };
 
 

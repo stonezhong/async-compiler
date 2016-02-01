@@ -14,8 +14,7 @@ var VarHandler = {
 
     return HandlerTool.buildNode(
       'var',
-      { defs: new UglifyJS.AST_Array({elements: elements}) },
-      this.appTransformer
+      { defs: new UglifyJS.AST_Array({elements: elements}) }
     );
   }
 };
@@ -29,13 +28,21 @@ function getVarDef(name, value) {
       value:  new UglifyJS.AST_String({value: name.name})
     })
   );
-
-  properties.push(
-    new UglifyJS.AST_ObjectKeyVal({
-      key: 'value',
-      value:  value
-    })
-  );
+  if (value === null) {
+    properties.push(
+      new UglifyJS.AST_ObjectKeyVal({
+        key: 'value',
+        value:  HandlerTool.buildUndefinedSymReference()
+      })
+    );
+  } else {
+    properties.push(
+      new UglifyJS.AST_ObjectKeyVal({
+        key: 'value',
+        value:  value
+      })
+    );
+  }
 
   return new UglifyJS.AST_Object({properties: properties});
 }

@@ -6,8 +6,7 @@ var ReturnHandler = {
     descend(node, this);
     return HandlerTool.buildNode(
       'return',
-      {value: node.value},
-      this.appTransformer
+      {value: node.value}
     );
   }
 };

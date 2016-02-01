@@ -9,8 +9,7 @@ var StringHandler = {
       {
         literal: node,
         refType: new UglifyJS.AST_String({value: 'literal'})
-      },
-      this.appTransformer
+      }
     );
   }
 };
