@@ -10,6 +10,8 @@ var SymbolRefHandler = require('../handler/SymbolRefHandler');
 var ReturnHandler = require('../handler/ReturnHandler');
 var VarHandler = require('../handler/VarHandler');
 var DotHandler = require('../handler/DotHandler');
+var SubHandler = require('../handler/SubHandler');
+var AtomHandler = require('../handler/AtomHandler');
 var Utility = require('../utility');
 
 class Transformer {
@@ -62,6 +64,7 @@ class Transformer {
       }
 
       transformer.fam.setExternalVariable('undefined');
+      transformer.fam.setExternalVariable('NaN');
 
 
       // 预扫描阶段只是收集下列信息
@@ -151,6 +154,14 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_Dot) {
       return DotHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Sub) {
+      return SubHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Atom) {
+      return AtomHandler.handle.call(this, node, descend);
     }
 
     return ;
