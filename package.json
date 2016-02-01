@@ -1,0 +1,19 @@
+{
+  "name": "async-compiler",
+  "version": "1.0.2",
+  "description": "A javascript compiler that support async functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "async",
+    "function",
+    "compiler"
+  ],
+  "author": "Stone Zhong <stonezhong@hotmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "uglify-js": "^2.6.1"
+  }
+}
