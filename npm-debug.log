@@ -1,0 +1,95 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@3.5.3
+3 info using node@v0.10.25
+4 verbose node symlink /usr/bin/node
+5 verbose publish [ '.' ]
+6 silly cache add args [ '.', null ]
+7 verbose cache add spec .
+8 silly cache add parsed spec { raw: '.',
+8 silly cache add   scope: null,
+8 silly cache add   name: null,
+8 silly cache add   rawSpec: '.',
+8 silly cache add   spec: '/mnt/DATA_DISK/Desktop/mylab/projects/tmp',
+8 silly cache add   type: 'directory' }
+9 verbose addLocalDirectory /mnt/DATA_DISK/.npm/async-compiler/1.0.3/package.tgz not in flight; packing
+10 info lifecycle async-compiler@1.0.3~prepublish: async-compiler@1.0.3
+11 silly lifecycle async-compiler@1.0.3~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ '/mnt/DATA_DISK/.npm/async-compiler/1.0.3/package.tgz',
+12 verbose tar pack   '/mnt/DATA_DISK/Desktop/mylab/projects/tmp' ]
+13 verbose tarball /mnt/DATA_DISK/.npm/async-compiler/1.0.3/package.tgz
+14 verbose folder /mnt/DATA_DISK/Desktop/mylab/projects/tmp
+15 verbose addLocalTarball adding from inside cache /mnt/DATA_DISK/.npm/async-compiler/1.0.3/package.tgz
+16 silly cache afterAdd async-compiler@1.0.3
+17 verbose afterAdd /mnt/DATA_DISK/.npm/async-compiler/1.0.3/package/package.json not in flight; writing
+18 verbose afterAdd /mnt/DATA_DISK/.npm/async-compiler/1.0.3/package/package.json written
+19 silly publish { name: 'async-compiler',
+19 silly publish   version: '1.0.3',
+19 silly publish   description: 'A javascript compiler that support async functions',
+19 silly publish   main: 'index.js',
+19 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+19 silly publish   repository:
+19 silly publish    { type: 'git',
+19 silly publish      url: 'git+https://github.com/stonezhong/async-compiler.git' },
+19 silly publish   keywords: [ 'async', 'function', 'compiler' ],
+19 silly publish   author: { name: 'Stone Zhong', email: 'stonezhong@hotmail.com' },
+19 silly publish   license: 'MIT',
+19 silly publish   dependencies: { 'uglify-js': '^2.6.1' },
+19 silly publish   readme: '# Async function compiler\n\n## Brief\n  When you have lots of asynchronous function and if they have dependencies, quickly your code may look like spaghetti.\n\n  This tool allows you write asynchronous function like synchronous function without the need to deal with callbacks, promises, etc..\n\n## Example\nLet\'s say you have add and mul, both are asynchronous, and you want to utilize those to do something more complex\n```\nfunction add(x, y) {\n  return Promise.resolve(x + y);\n}\nfunction mul(x, y) {\n  return Promise.resolve(x * y);\n}\n```\nIf we want to compute mul(add(3, 4), add(5, 6)), we could use promise and have some code below:\n```\nfunction foo() {\n  // we want to return mul(add(3, 4), add(5, 6))\n\n  return add(3, 4).then(function(v) {\n    return add(5, 6).then(function(w) {\n      return mul(v, w);\n    });\n  });\n}\n\nfoo().then(function(v) {\n  console.log(`v = ${v}`);\n});\n```\nThe code is pretty difficult to understand, and once you have many async calls, quickly your code becomes unreadable.\n\nNow, consider if you can write code like below:\n```\nvar AsyncTool = require(\'async-compiler-runtime\');\n\nfunction add(x, y) {\n  return Promise.resolve(x + y);\n}\n\nfunction mul(x, y) {\n  return Promise.resolve(x * y);\n}\n\n/** @async **/\nfunction foo() {\n  return mul(add(3, 4), add(5, 6));\n}\n\nfoo().then(function(result) {\n  console.info(result);\n});\n```\nYour code is now much simpler, all you need to do is add a jsdoc comment `/** @async **/` at the beginning of async function.\n\n## Usage\n```\nnode -harmony node_modules/async-compiler/compile.js --input <input file> --output <output>\n```\n\n## Example\n```\nnode -harmony node_modules/async-compiler/compile.js --input abc.js --output def.js\nnode -harmony def.js\n```\n',
+19 silly publish   readmeFilename: 'README.md',
+19 silly publish   gitHead: '2ba8d10fb4f151f00cdd887dde4281567dba72ee',
+19 silly publish   bugs: { url: 'https://github.com/stonezhong/async-compiler/issues' },
+19 silly publish   homepage: 'https://github.com/stonezhong/async-compiler#readme',
+19 silly publish   _id: 'async-compiler@1.0.3',
+19 silly publish   _shasum: '6616f944413340d36439118f512ca1572c8ea696',
+19 silly publish   _from: '.' }
+20 verbose getPublishConfig undefined
+21 silly mapToRegistry name async-compiler
+22 silly mapToRegistry using default registry
+23 silly mapToRegistry registry https://registry.npmjs.org/
+24 silly mapToRegistry uri https://registry.npmjs.org/async-compiler
+25 verbose publish registryBase https://registry.npmjs.org/
+26 silly publish uploading /mnt/DATA_DISK/.npm/async-compiler/1.0.3/package.tgz
+27 verbose request uri https://registry.npmjs.org/async-compiler
+28 verbose request sending authorization for write operation
+29 info attempt registry request try #1 at 22:28:08
+30 verbose request using bearer token for auth
+31 verbose request id 00fc5065e2e77eb9
+32 http request PUT https://registry.npmjs.org/async-compiler
+33 http 403 https://registry.npmjs.org/async-compiler
+34 verbose headers { 'content-type': 'application/json',
+34 verbose headers   'cache-control': 'max-age=300',
+34 verbose headers   'content-length': '95',
+34 verbose headers   'accept-ranges': 'bytes',
+34 verbose headers   date: 'Mon, 01 Feb 2016 06:28:05 GMT',
+34 verbose headers   via: '1.1 varnish',
+34 verbose headers   connection: 'keep-alive',
+34 verbose headers   'x-served-by': 'cache-lax1434-LAX',
+34 verbose headers   'x-cache': 'MISS',
+34 verbose headers   'x-cache-hits': '0',
+34 verbose headers   'x-timer': 'S1454308085.072180,VS0,VE82' }
+35 verbose request invalidating /mnt/DATA_DISK/.npm/registry.npmjs.org/async-compiler on PUT
+36 error publish Failed PUT 403
+37 verbose stack Error: "You cannot publish over the previously published version 1.0.3." : async-compiler
+37 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+37 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:252:14)
+37 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+37 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:198:22)
+37 verbose stack     at Request.EventEmitter.emit (events.js:98:17)
+37 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1035:10)
+37 verbose stack     at Request.EventEmitter.emit (events.js:117:20)
+37 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:962:12)
+37 verbose stack     at IncomingMessage.EventEmitter.emit (events.js:117:20)
+37 verbose stack     at _stream_readable.js:920:16
+38 verbose statusCode 403
+39 verbose pkgid async-compiler
+40 verbose cwd /mnt/DATA_DISK/Desktop/mylab/projects/tmp
+41 error Linux 3.19.0-47-generic
+42 error argv "node" "/usr/local/bin/npm" "publish"
+43 error node v0.10.25
+44 error npm  v3.5.3
+45 error code E403
+46 error "You cannot publish over the previously published version 1.0.3." : async-compiler
+47 error If you need help, you may report this error at:
+47 error     <https://github.com/npm/npm/issues>
+48 verbose exit [ 1, true ]
