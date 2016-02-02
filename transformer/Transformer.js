@@ -15,6 +15,9 @@ var AtomHandler = require('../handler/AtomHandler');
 var IfHandler = require('../handler/IfHandler');
 var BlockHandler = require('../handler/BlockHandler');
 var EmptyStatementHandler = require('../handler/EmptyStatementHandler');
+var ForHandler = require('../handler/ForHandler');
+var PostUnaryHandler = require('../handler/PostUnaryHandler');
+var PreUnaryHandler = require('../handler/PreUnaryHandler');
 var Utility = require('../utility');
 
 class Transformer {
@@ -177,6 +180,18 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_EmptyStatement) {
       return EmptyStatementHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_For) {
+      return ForHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_UnaryPostfix) {
+      return PostUnaryHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_UnaryPrefix) {
+      return PreUnaryHandler.handle.call(this, node, descend);
     }
 
     return ;
