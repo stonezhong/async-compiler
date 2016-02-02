@@ -12,6 +12,9 @@ var VarHandler = require('../handler/VarHandler');
 var DotHandler = require('../handler/DotHandler');
 var SubHandler = require('../handler/SubHandler');
 var AtomHandler = require('../handler/AtomHandler');
+var IfHandler = require('../handler/IfHandler');
+var BlockHandler = require('../handler/BlockHandler');
+var EmptyStatementHandler = require('../handler/EmptyStatementHandler');
 var Utility = require('../utility');
 
 class Transformer {
@@ -162,6 +165,18 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_Atom) {
       return AtomHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_If) {
+      return IfHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_BlockStatement) {
+      return BlockHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_EmptyStatement) {
+      return EmptyStatementHandler.handle.call(this, node, descend);
     }
 
     return ;
