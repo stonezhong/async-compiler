@@ -18,7 +18,10 @@ var EmptyStatementHandler = require('../handler/EmptyStatementHandler');
 var ForHandler = require('../handler/ForHandler');
 var PostUnaryHandler = require('../handler/PostUnaryHandler');
 var PreUnaryHandler = require('../handler/PreUnaryHandler');
+var WhileHandler = require('../handler/WhileHandler');
 var Utility = require('../utility');
+var ContinueStatementHandler = require('../handler/ContinueStatementHandler');
+var BreakStatementHandler = require('../handler/BreakStatementHandler');
 
 class Transformer {
   constructor() {
@@ -192,6 +195,18 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_UnaryPrefix) {
       return PreUnaryHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_While) {
+      return WhileHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Continue) {
+      return ContinueStatementHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Break) {
+      return BreakStatementHandler.handle.call(this, node, descend);
     }
 
     return ;
