@@ -24,6 +24,9 @@ var ContinueStatementHandler = require('../handler/ContinueStatementHandler');
 var BreakStatementHandler = require('../handler/BreakStatementHandler');
 var DoHandler = require('../handler/DoHandler');
 var CommaHandler = require('../handler/CommaHandler');
+var ObjectHandler = require('../handler/ObjectHandler');
+var ObjectPropertyHandler = require('../handler/ObjectPropertyHandler');
+var ArrayHandler = require('../handler/ArrayHandler');
 
 class Transformer {
   constructor() {
@@ -217,6 +220,18 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_Seq) {
       return CommaHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Object) {
+      return ObjectHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_ObjectProperty) {
+      return ObjectPropertyHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Array) {
+      return ArrayHandler.handle.call(this, node, descend);
     }
 
     return ;
