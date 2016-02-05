@@ -22,6 +22,8 @@ var WhileHandler = require('../handler/WhileHandler');
 var Utility = require('../utility');
 var ContinueStatementHandler = require('../handler/ContinueStatementHandler');
 var BreakStatementHandler = require('../handler/BreakStatementHandler');
+var DoHandler = require('../handler/DoHandler');
+var CommaHandler = require('../handler/CommaHandler');
 
 class Transformer {
   constructor() {
@@ -207,6 +209,14 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_Break) {
       return BreakStatementHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Do) {
+      return DoHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Seq) {
+      return CommaHandler.handle.call(this, node, descend);
     }
 
     return ;
