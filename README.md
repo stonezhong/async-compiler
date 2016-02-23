@@ -58,11 +58,11 @@ Your code is now much simpler, all you need to do is add a jsdoc comment `/** @a
 
 ## Usage
 ```
-node -harmony node_modules/async-compiler/compile.js --input <input file> --output <output>
+node --harmony node_modules/async-compiler/compile.js --input <input file> --output <output>
 ```
 
 ## Example
 ```
-node -harmony node_modules/async-compiler/compile.js --input abc.js --output def.js
-node -harmony def.js
+node --harmony node_modules/async-compiler/compile.js --input abc.js --output def.js
+node --harmony def.js
 ```
