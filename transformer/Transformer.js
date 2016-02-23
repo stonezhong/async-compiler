@@ -27,6 +27,7 @@ var CommaHandler = require('../handler/CommaHandler');
 var ObjectHandler = require('../handler/ObjectHandler');
 var ObjectPropertyHandler = require('../handler/ObjectPropertyHandler');
 var ArrayHandler = require('../handler/ArrayHandler');
+var NewHandler = require('../handler/NewHandler');
 
 class Transformer {
   constructor() {
@@ -143,6 +144,9 @@ class Transformer {
     }
 
     if (node instanceof UglifyJS.AST_Call) {
+      if (node instanceof UglifyJS.AST_New) {
+        return NewHandler.handle.call(this, node, descend);
+      }
       return CallHandler.handle.call(this, node, descend);
     }
 
