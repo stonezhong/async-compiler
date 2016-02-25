@@ -42,6 +42,9 @@ class Transformer {
 
   /* is the function represented by node a async function ?? */
   isAsyncFunction(node) {
+    if (typeof(node.start) === 'undefined') {
+      return false;
+    }
     var comments = node.start.comments_before;
     for (var i = 0; i < comments.length; i ++) {
       var comment = comments[i];
@@ -57,22 +60,45 @@ class Transformer {
   before(node, descend) {
     var transformer = this.appTransformer;
 
+    if (transformer.fam.getAttribute("isPrePass")) {
+      if ((node instanceof UglifyJS.AST_Defun) || (node instanceof UglifyJS.AST_Function)) {
+        // do nothing
+      } else {
+        descend(node, this);
+      }
+      if (node instanceof UglifyJS.AST_SymbolRef) {
+        transformer.fam.setExternalVariable(node.name);
+      } else if (node instanceof UglifyJS.AST_Var) {
+        for (var i = 0; i < node.definitions.length; i ++) {
+          var definition = node.definitions[i];
+          transformer.fam.setLocalVariable(definition.name.name);
+        }
+      }
+      return node;
+    }
+
     // 处理一个函数定义
     if ((node instanceof UglifyJS.AST_Defun) ||
         (node instanceof UglifyJS.AST_Function)) {
 
-      var isAsync = transformer.isAsyncFunction(node);
-
-      // 非异步函数，无须处理
-      if (!isAsync) {
+      // 非异步函数
+      if (!transformer.isAsyncFunction(node)) {
         transformer.fam.push({isAsync: false});
         descend(node, this);
         transformer.fam.pop();
+        if (transformer.fam.getAttribute("isAsync")) {
+          return HandlerTool.buildNode(
+            'ref',
+            {
+              literal: node,
+              refType: new UglifyJS.AST_String({value: 'literal'})
+            }
+          );
+        }
         return node;
       }
 
-
-      transformer.fam.push({ isAsync: isAsync, variables: {}, isPrePass: true });
+      transformer.fam.push({ isAsync: true, variables: {}, isPrePass: true });
       for (var i = 0; i < node.argnames.length; i ++) {
         var varName = node.argnames[i].name;
         transformer.fam.setArgumentVariable(varName);
@@ -115,25 +141,10 @@ class Transformer {
     }
 
     if (!transformer.fam.getAttribute("isAsync")) {
-      return ;
+      // not a function node and we are not inside a async function, bypass
+      descend(node, this);
+      return node;
     }
-
-    if (transformer.fam.getAttribute("isPrePass")) {
-      if (node instanceof UglifyJS.AST_SymbolRef) {
-        transformer.fam.setExternalVariable(node.name);
-        return ;
-      }
-
-      if (node instanceof UglifyJS.AST_Var) {
-        for (var i = 0; i < node.definitions.length; i ++) {
-          var definition = node.definitions[i];
-          transformer.fam.setLocalVariable(definition.name.name);
-        }
-        return ;
-      }
-      return ;
-    }
-
 
     if (node instanceof UglifyJS.AST_SimpleStatement) {
       return SimpleStatementHandler.handle.call(this, node, descend);
@@ -238,7 +249,10 @@ class Transformer {
       return ArrayHandler.handle.call(this, node, descend);
     }
 
-    return ;
+    // for anything we don't understand, pass it through
+    // console.log(ParserTool.findNodeType(node));
+    descend(node, this);
+    return node;
   }
 }
 
@@ -339,3 +353,4 @@ function buildFunctionBody(node, context, functionAttributes) {
 }
 
 module.exports = Transformer;
+var HandlerTool = require('../handler/HandlerTool');
