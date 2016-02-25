@@ -66,3 +66,5 @@ node --harmony node_modules/async-compiler/compile.js --input <input file> --out
 node --harmony node_modules/async-compiler/compile.js --input abc.js --output def.js
 node --harmony def.js
 ```
+
+[Comparing async compiler against ES7's async function](compare-to-es7-async.md)
