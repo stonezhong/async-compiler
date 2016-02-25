@@ -1,7 +1,5 @@
 # Compare async compiler to ES7 async function side by side
-```
-conclusion: it appears async compiler produces the same result comparing to ES7's async function. In some cases, ES7's await is broken (see "access object field -- case 2").
-```
+<b>conclusion: it appears async compiler produces the same result comparing to ES7's async function. In some cases, ES7's await is broken (see "access object field -- case 2").</b>
 
 For the ES7 test, I am using the following config:
 ```
