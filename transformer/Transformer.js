@@ -28,6 +28,7 @@ var ObjectHandler = require('../handler/ObjectHandler');
 var ObjectPropertyHandler = require('../handler/ObjectPropertyHandler');
 var ArrayHandler = require('../handler/ArrayHandler');
 var NewHandler = require('../handler/NewHandler');
+var ConditionalHandler = require('../handler/ConditionalHandler');
 
 class Transformer {
   constructor() {
@@ -247,6 +248,10 @@ class Transformer {
 
     if (node instanceof UglifyJS.AST_Array) {
       return ArrayHandler.handle.call(this, node, descend);
+    }
+
+    if (node instanceof UglifyJS.AST_Conditional) {
+      return ConditionalHandler.handle.call(this, node, descend);
     }
 
     // for anything we don't understand, pass it through
