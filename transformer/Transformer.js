@@ -69,7 +69,7 @@ class Transformer {
       }
       if (node instanceof UglifyJS.AST_SymbolRef) {
         transformer.fam.setExternalVariable(node.name);
-      } else if (node instanceof UglifyJS.AST_Var) {
+      } else if ((node instanceof UglifyJS.AST_Var) || (node instanceof UglifyJS.AST_Const)) {
         for (var i = 0; i < node.definitions.length; i ++) {
           var definition = node.definitions[i];
           transformer.fam.setLocalVariable(definition.name.name);
@@ -147,111 +147,9 @@ class Transformer {
       return node;
     }
 
-    if (node instanceof UglifyJS.AST_SimpleStatement) {
-      return SimpleStatementHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Binary) {
-      return BinaryHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Call) {
-      if (node instanceof UglifyJS.AST_New) {
-        return NewHandler.handle.call(this, node, descend);
-      }
-      return CallHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_String) {
-      return StringHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Number) {
-      return NumberHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_SymbolRef) {
-      return SymbolRefHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Return) {
-      return ReturnHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Var) {
-      return VarHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Dot) {
-      return DotHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Sub) {
-      return SubHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Atom) {
-      return AtomHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_If) {
-      return IfHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_BlockStatement) {
-      return BlockHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_EmptyStatement) {
-      return EmptyStatementHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_For) {
-      return ForHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_UnaryPostfix) {
-      return PostUnaryHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_UnaryPrefix) {
-      return PreUnaryHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_While) {
-      return WhileHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Continue) {
-      return ContinueStatementHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Break) {
-      return BreakStatementHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Do) {
-      return DoHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Seq) {
-      return CommaHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Object) {
-      return ObjectHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_ObjectProperty) {
-      return ObjectPropertyHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Array) {
-      return ArrayHandler.handle.call(this, node, descend);
-    }
-
-    if (node instanceof UglifyJS.AST_Conditional) {
-      return ConditionalHandler.handle.call(this, node, descend);
+    var handler = getHandler(node);
+    if (typeof(handler) !== 'undefined') {
+      return handler.handle.call(this, node, descend);
     }
 
     // for anything we don't understand, pass it through
@@ -355,6 +253,96 @@ function buildFunctionBody(node, context, functionAttributes) {
   node.body = [buildExternalVariableAccessors(functionAttributes),  varNode, returnNode];
 
   return node;
+}
+
+function getHandler(node) {
+  if (node instanceof UglifyJS.AST_SimpleStatement) {
+    return SimpleStatementHandler;
+  }
+  if (node instanceof UglifyJS.AST_Binary) {
+    return BinaryHandler;
+  }
+  if (node instanceof UglifyJS.AST_Call) {
+    if (node instanceof UglifyJS.AST_New) {
+      return NewHandler;
+    }
+    return CallHandler;
+  }
+  if (node instanceof UglifyJS.AST_String) {
+    return StringHandler;
+  }
+  if (node instanceof UglifyJS.AST_Number) {
+    return NumberHandler;
+  }
+  if (node instanceof UglifyJS.AST_SymbolRef) {
+    return SymbolRefHandler;
+  }
+  if (node instanceof UglifyJS.AST_Return) {
+    return ReturnHandler;
+  }
+  if (node instanceof UglifyJS.AST_Var) {
+    return VarHandler;
+  }
+  if (node instanceof UglifyJS.AST_Const) {
+    return VarHandler;
+  }
+  if (node instanceof UglifyJS.AST_Dot) {
+    return DotHandler;
+  }
+  if (node instanceof UglifyJS.AST_Sub) {
+    return SubHandler;
+  }
+  if (node instanceof UglifyJS.AST_Atom) {
+    return AtomHandler;
+  }
+  if (node instanceof UglifyJS.AST_RegExp) {
+    return AtomHandler;
+  }
+  if (node instanceof UglifyJS.AST_If) {
+    return IfHandler;
+  }
+  if (node instanceof UglifyJS.AST_BlockStatement) {
+    return BlockHandler;
+  }
+  if (node instanceof UglifyJS.AST_EmptyStatement) {
+    return EmptyStatementHandler;
+  }
+  if (node instanceof UglifyJS.AST_For) {
+    return ForHandler;
+  }
+  if (node instanceof UglifyJS.AST_UnaryPostfix) {
+    return PostUnaryHandler;
+  }
+  if (node instanceof UglifyJS.AST_UnaryPrefix) {
+    return PreUnaryHandler;
+  }
+  if (node instanceof UglifyJS.AST_While) {
+    return WhileHandler;
+  }
+  if (node instanceof UglifyJS.AST_Continue) {
+    return ContinueStatementHandler;
+  }
+  if (node instanceof UglifyJS.AST_Break) {
+    return BreakStatementHandler;
+  }
+  if (node instanceof UglifyJS.AST_Do) {
+    return DoHandler;
+  }
+  if (node instanceof UglifyJS.AST_Seq) {
+    return CommaHandler;
+  }
+  if (node instanceof UglifyJS.AST_Object) {
+    return ObjectHandler;
+  }
+  if (node instanceof UglifyJS.AST_ObjectProperty) {
+    return ObjectPropertyHandler;
+  }
+  if (node instanceof UglifyJS.AST_Array) {
+    return ArrayHandler;
+  }
+  if (node instanceof UglifyJS.AST_Conditional) {
+    return ConditionalHandler;
+  }
 }
 
 module.exports = Transformer;
