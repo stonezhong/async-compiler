@@ -1,6 +1,6 @@
 {
   "name": "async-compiler",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A javascript compiler that support async functions",
   "main": "index.js",
   "scripts": {

@@ -29,6 +29,10 @@ var ObjectPropertyHandler = require('../handler/ObjectPropertyHandler');
 var ArrayHandler = require('../handler/ArrayHandler');
 var NewHandler = require('../handler/NewHandler');
 var ConditionalHandler = require('../handler/ConditionalHandler');
+var ThrowHandler = require('../handler/ThrowHandler');
+var TryHandler = require('../handler/TryHandler');
+var CatchHandler = require('../handler/CatchHandler');
+var FinallyHandler = require('../handler/FinallyHandler');
 
 class Transformer {
   constructor() {
@@ -119,26 +123,7 @@ class Transformer {
       descend(node, this);
       var functionAttributes = transformer.fam.pop();
 
-      var properties = [ ];
-      for (var variable in functionAttributes.variables) {
-        if (functionAttributes.variables[variable] === 'external') {
-          continue;
-        }
-        var value = new UglifyJS.AST_SymbolRef({name: 'undefined'});
-        if (functionAttributes.variables[variable] === 'argument') {
-          value = new UglifyJS.AST_SymbolRef({name: variable});
-        }
-        properties.push(
-          new UglifyJS.AST_ObjectKeyVal({
-            key: variable,
-            value:  value
-          })
-        );
-      }
-
-      return buildFunctionBody(
-        node, new UglifyJS.AST_Object({properties: properties}), functionAttributes
-      );
+      return buildFunctionBody(node, functionAttributes);
     }
 
     if (!transformer.fam.getAttribute("isAsync")) {
@@ -187,30 +172,56 @@ function buildSingleGetter(variableName) {
   });
 }
 
-function buildExternalVariableAccessors(functionAttributes) {
-  var properties = [ ];
-  for (var varName in functionAttributes.variables) {
-    if (functionAttributes.variables[varName] === 'external') {
-      properties.push(
-        new UglifyJS.AST_ObjectKeyVal({
-          key:    'set_' + varName,
-          value:  buildSingleSetter(varName)
-        })
-      );
-      properties.push(
-        new UglifyJS.AST_ObjectKeyVal({
-          key:    'get_' + varName,
-          value:  buildSingleGetter(varName)
-        })
-      );
+function buildVarDefForLocalVariables(functionAttributes) {
+  var varDefs = [];
+  for (var variable in functionAttributes.variables) {
+    if (functionAttributes.variables[variable] !== 'local') {
+      continue;
     }
+    varDefs.push(new UglifyJS.AST_VarDef({
+      name: new UglifyJS.AST_SymbolVar({name: variable}),
+    }));
   }
-  var objToDef = new UglifyJS.AST_Object({properties: properties});
+  if (varDefs.length === 0) {
+    return new UglifyJS.AST_EmptyStatement();
+  }
+  return new UglifyJS.AST_Var({definitions: varDefs});
+}
 
+function buildVariableAccessors(functionAttributes) {
+  var properties = [ ];
+  for (var variable in functionAttributes.variables) {
+    properties.push(
+      new UglifyJS.AST_ObjectKeyVal({
+        key:    'set_' + variable,
+        value:  buildSingleSetter(variable)
+      })
+    );
+    properties.push(
+      new UglifyJS.AST_ObjectKeyVal({
+        key:    'get_' + variable,
+        value:  buildSingleGetter(variable)
+      })
+    );
+  }
+
+  return new UglifyJS.AST_Object({properties: properties});
+}
+
+function buildAsyncContext(functionAttributes) {
+  var properties = [ ];
+  properties.push(
+    new UglifyJS.AST_ObjectKeyVal({
+      key:    'accessors',
+      value:  buildVariableAccessors(functionAttributes)
+    })
+  );
+
+  var objToDef = new UglifyJS.AST_Object({properties: properties});
 
   var varDefinitions = [];
   varDefinitions.push(new UglifyJS.AST_VarDef({
-    name: new UglifyJS.AST_SymbolVar({name: "__accessors__"}),
+    name: new UglifyJS.AST_SymbolVar({name: "__async_context__"}),
     value: objToDef
   }));
   var varNode = new UglifyJS.AST_Var({
@@ -220,7 +231,7 @@ function buildExternalVariableAccessors(functionAttributes) {
   return varNode;
 }
 
-function buildFunctionBody(node, context, functionAttributes) {
+function buildFunctionBody(node, functionAttributes) {
   var funcNode = new UglifyJS.AST_Dot({
     expression: new UglifyJS.AST_SymbolRef({name: 'AsyncTool'}),
     property: 'eval'
@@ -229,8 +240,7 @@ function buildFunctionBody(node, context, functionAttributes) {
   var callNode =  new UglifyJS.AST_Call({
     expression: funcNode,
     args: [
-      new UglifyJS.AST_SymbolRef({name: '__local_variables__'}),
-      new UglifyJS.AST_SymbolRef({name: '__accessors__'}),
+      new UglifyJS.AST_SymbolRef({name: '__async_context__'}),
       new UglifyJS.AST_Array({elements: Utility.dupArray(node.body)})
     ]
   });
@@ -239,18 +249,11 @@ function buildFunctionBody(node, context, functionAttributes) {
     value: callNode
   });
 
-  {
-    var varDefinitions = [];
-    varDefinitions.push(new UglifyJS.AST_VarDef({
-      name: new UglifyJS.AST_SymbolVar({name: "__local_variables__"}),
-      value: context
-    }));
-    var varNode = new UglifyJS.AST_Var({
-      definitions: varDefinitions
-    });
-  }
-
-  node.body = [buildExternalVariableAccessors(functionAttributes),  varNode, returnNode];
+  node.body = [
+    buildVarDefForLocalVariables(functionAttributes),
+    buildAsyncContext(functionAttributes),
+    returnNode
+  ];
 
   return node;
 }
@@ -342,6 +345,18 @@ function getHandler(node) {
   }
   if (node instanceof UglifyJS.AST_Conditional) {
     return ConditionalHandler;
+  }
+  if (node instanceof UglifyJS.AST_Throw) {
+    return ThrowHandler;
+  }
+  if (node instanceof UglifyJS.AST_Try) {
+    return TryHandler;
+  }
+  if (node instanceof UglifyJS.AST_Catch) {
+    return CatchHandler;
+  }
+  if (node instanceof UglifyJS.AST_Finally) {
+    return FinallyHandler;
   }
 }
 
