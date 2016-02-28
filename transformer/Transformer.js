@@ -36,6 +36,7 @@ var FinallyHandler = require('../handler/FinallyHandler');
 var ForInHandler = require('../handler/ForInHandler');
 var SwitchHandler = require('../handler/SwitchHandler');
 var CaseHandler = require('../handler/CaseHandler');
+var ThisHandler = require('../handler/ThisHandler');
 
 class Transformer {
   constructor() {
@@ -81,6 +82,8 @@ class Transformer {
           var definition = node.definitions[i];
           transformer.fam.setLocalVariable(definition.name.name);
         }
+      } else if (node instanceof UglifyJS.AST_This) {
+        transformer.fam.setAttribute('isThisAccessed', true);
       }
       return node;
     }
@@ -126,6 +129,7 @@ class Transformer {
       descend(node, this);
       var functionAttributes = transformer.fam.pop();
 
+      setUniqueVariableForThis(functionAttributes);
       return buildFunctionBody(node, functionAttributes);
     }
 
@@ -144,6 +148,18 @@ class Transformer {
     // console.log(ParserTool.findNodeType(node));
     descend(node, this);
     return node;
+  }
+}
+
+function setUniqueVariableForThis(functionAttributes) {
+  if (functionAttributes.isThisAccessed) {
+    for (var i = 0; ; i ++) {
+      var variableName = 'this' + i;
+      if (!(variableName in functionAttributes.variables)) {
+        functionAttributes.fakeThisVariableName = variableName;
+        return ;
+      }
+    }
   }
 }
 
@@ -185,6 +201,12 @@ function buildVarDefForLocalVariables(functionAttributes) {
       name: new UglifyJS.AST_SymbolVar({name: variable}),
     }));
   }
+  if (functionAttributes.isThisAccessed) {
+    varDefs.push(new UglifyJS.AST_VarDef({
+      name: new UglifyJS.AST_SymbolVar({name: functionAttributes.fakeThisVariableName}),
+      value: new UglifyJS.AST_This({name: 'this'}),
+    }));
+  }
   if (varDefs.length === 0) {
     return new UglifyJS.AST_EmptyStatement();
   }
@@ -204,6 +226,20 @@ function buildVariableAccessors(functionAttributes) {
       new UglifyJS.AST_ObjectKeyVal({
         key:    'get_' + variable,
         value:  buildSingleGetter(variable)
+      })
+    );
+  }
+  if (functionAttributes.isThisAccessed) {
+    properties.push(
+      new UglifyJS.AST_ObjectKeyVal({
+        key:    'set_this',
+        value:  buildSingleSetter(functionAttributes.fakeThisVariableName)
+      })
+    );
+    properties.push(
+      new UglifyJS.AST_ObjectKeyVal({
+        key:    'get_this',
+        value:  buildSingleGetter(functionAttributes.fakeThisVariableName)
       })
     );
   }
@@ -369,6 +405,9 @@ function getHandler(node) {
   }
   if (node instanceof UglifyJS.AST_SwitchBranch) {
     return CaseHandler;
+  }
+  if (node instanceof UglifyJS.AST_This) {
+    return ThisHandler;
   }
 }
 
