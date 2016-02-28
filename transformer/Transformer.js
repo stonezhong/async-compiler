@@ -33,6 +33,7 @@ var ThrowHandler = require('../handler/ThrowHandler');
 var TryHandler = require('../handler/TryHandler');
 var CatchHandler = require('../handler/CatchHandler');
 var FinallyHandler = require('../handler/FinallyHandler');
+var ForInHandler = require('../handler/ForInHandler');
 
 class Transformer {
   constructor() {
@@ -357,6 +358,9 @@ function getHandler(node) {
   }
   if (node instanceof UglifyJS.AST_Finally) {
     return FinallyHandler;
+  }
+  if (node instanceof UglifyJS.AST_ForIn) {
+    return ForInHandler;
   }
 }
 
